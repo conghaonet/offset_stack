@@ -4,8 +4,6 @@ homepage: https://github.com/conghaonet/offset_stack
 repository: https://github.com/conghaonet/offset_stack
 version: 0.0.1
 
-publish_to: https://pub.dev
-
 platforms:
   android:
   ios:
