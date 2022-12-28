@@ -1,7 +1,21 @@
 library offset_stack;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
+import 'package:flutter/widgets.dart';
+import 'package:offset_stack/offset_stack_render.dart';
+typedef MoreWidget = Widget Function(int surplus);
+class OffsetStack extends MultiChildRenderObjectWidget {
+  final double coverage;
+  final MoreWidget? moreWidget;
+  OffsetStack({required this.coverage, required super.children, this.moreWidget, super.key});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return OffsetStackRender(coverage);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, OffsetStackRender renderObject) {
+    renderObject.coverage = coverage;
+  }
+
 }

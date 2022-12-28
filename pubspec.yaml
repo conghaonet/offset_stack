@@ -1,7 +1,7 @@
 name: offset_stack
 description: offset_stack is a pure dart package that allows you to create an widget stack with offset.
-homepage: https://github.com/conghaonet/offset_stack
 repository: https://github.com/conghaonet/offset_stack
+issue_tracker: https://github.com/conghaonet/offset_stack/issues
 version: 0.0.1
 
 platforms:
