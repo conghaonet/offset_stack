@@ -56,8 +56,8 @@ class OffsetStackRender extends RenderBox with
       parentData.height = child.size.height;
       double offsetX = rowRectList.last.width - lastChildRect.width * coverage;
       parentData.offset = Offset(offsetX , parentData.height * rowIndex);
-      lastChildRect = parentData.content;
-      rowRectList.last = rowRectList.last.expandToInclude(parentData.content);
+      lastChildRect = parentData.rect;
+      rowRectList.last = rowRectList.last.expandToInclude(parentData.rect);
       totalRect = totalRect.expandToInclude(rowRectList.last);
       ++visibleCount;
       child = parentData.nextSibling;
@@ -83,10 +83,9 @@ class OffsetStackRender extends RenderBox with
 }
 
 class OffsetStackParentData extends ContainerBoxParentData<RenderBox> {
-  late double width;
-  late double height;
-
-  Rect get content => Rect.fromLTWH(
+  double width = 0;
+  double height = 0;
+  Rect get rect => Rect.fromLTWH(
     offset.dx,
     offset.dy,
     width,
