@@ -1,5 +1,4 @@
 import 'package:flutter/rendering.dart';
-import 'package:offset_stack/offset_stack.dart';
 
 class OffsetStackRender extends RenderBox with
     ContainerRenderObjectMixin<RenderBox, OffsetStackParentData>,
@@ -33,41 +32,37 @@ class OffsetStackRender extends RenderBox with
       return;
     }
     ///初始化区域
-    var recordRect = Rect.zero;
-    var recordRectList = [Rect.zero];
+    var lastChildRect = Rect.zero;
+    var rowRectList = [Rect.zero];
+    var totalRect = Rect.zero;
     RenderBox? child = firstChild;
-    int count = 0;
-    int line = 0;
+    int visibleCount = 0;
+    int rowIndex = 0;
     while (child != null) {
-      // var childBoxConstraints = (child as RenderConstrainedBox).additionalConstraints;
-      var computeSize = child.computeDryLayout(constraints);
-
-      Size tempSize = Size(recordRectList.last.size.width + computeSize.width, recordRectList.last.size.height + computeSize.height);
-      if(tempSize.width > constraints.biggest.width) {
-        if(constraints.biggest.height - recordRectList.last.height >= tempSize.height) {
-          ++line;
-          count = 0;
-          recordRectList.add(Rect.zero);
+      Size childDrySize = child.getDryLayout(constraints);
+      Size rowSize = Size(rowRectList.last.size.width + childDrySize.width, rowRectList.last.size.height + childDrySize.height);
+      if(rowSize.width > constraints.biggest.width) {
+        if(constraints.biggest.height - rowRectList.last.height >= rowSize.height) {
+          ++rowIndex;
+          lastChildRect = Rect.zero;
+          rowRectList.add(Rect.zero);
         } else {
-          computeSize = Size.zero;
+          childDrySize = Size.zero;
         }
       }
-
-      child.layout(BoxConstraints.tight(computeSize), parentUsesSize: true);
-
+      child.layout(BoxConstraints.tight(childDrySize), parentUsesSize: true);
       final OffsetStackParentData parentData = child.parentData! as OffsetStackParentData;
       parentData.width = child.size.width;
       parentData.height = child.size.height;
-      double value = count * child.size.width * (1 - coverage);
-      parentData.offset = Offset(value , parentData.height * line);
-
-      recordRectList.last = recordRectList.last.expandToInclude(parentData.content);
-      recordRect = recordRect.expandToInclude(recordRectList.last);
-      ++count;
+      double offsetX = rowRectList.last.width - lastChildRect.width * coverage;
+      parentData.offset = Offset(offsetX , parentData.height * rowIndex);
+      lastChildRect = parentData.content;
+      rowRectList.last = rowRectList.last.expandToInclude(parentData.content);
+      totalRect = totalRect.expandToInclude(rowRectList.last);
+      ++visibleCount;
       child = parentData.nextSibling;
     }
-    // size = Size(constraints.maxWidth, _layoutSize);
-    size = constraints.tighten(height: recordRect.height, width: recordRect.width,).smallest;
+    size = constraints.tighten(height: totalRect.height, width: totalRect.width,).smallest;
   }
 
   @override
